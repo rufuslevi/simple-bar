@@ -215,13 +215,13 @@ export const Playing = (props) => (
 
 export const Prev = (props) => (
     <Icon viewBox={'0 96 960 960'} width={48} height={48} {...props}>
-        <path d="M220 816V336h60v480h-60Zm520 0L394 576l346-240v480Zm-60-240Zm0 125V451L499 576l181 125Z" />
+        <path d="M177 859V293h91v566h-91Zm606 0L372 576l411-283v566Z" />
     </Icon>
 );
 
 export const Next = (props) => (
     <Icon viewBox={'0 96 960 960'} width={48} height={48} {...props}>
-        <path d="M680 816V336h60v480h-60Zm-460 0V336l346 240-346 240Zm60-240Zm0 125 181-125-181-125v250Z" />
+        <path d="M692 859V293h91v566h-91Zm-515 0V293l411 283-411 283Z" />
     </Icon>
 )
 
