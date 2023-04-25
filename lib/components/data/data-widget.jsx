@@ -35,10 +35,11 @@ export const Widget = ({
     showSpecter,
     children,
     disableInner,
+    disableClick,
 }) => {
     const ref = Uebersicht.React.useRef();
     const Tag = getTag(onClick, href);
-    const dataWidgetClasses = Utils.classnames("data-widget", classes, {
+    const dataWidgetClasses = Utils.classnames("data-widget", classes, !disableClick && {
         "data-widget--clickable": onClick,
     });
 

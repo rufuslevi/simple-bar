@@ -99,23 +99,27 @@ export const Widget = () => {
     };
 
     const classes = Utils.classnames("music", { "music--playing": isPlaying });
+    const clickable = Utils.classnames("music", "data-widget--clickable");
 
     return (
-        <div
-            style={{ display: 'flex' }}
+        <DataWidget.Widget
+            classes={clickable}
+            disableSlider={true}
+            onMiddleClick={onMiddleClick}
         >
             <DataWidget.Widget
                 classes={classes}
                 onClick={prevTrack}
                 Icon={Icons.Prev}
                 disableInner={true}
+                disableClick={true}
             >
             </DataWidget.Widget>
             <DataWidget.Widget
                 classes={classes}
                 Icon={Icon}
                 onClick={playPause}
-                onMiddleClick={onMiddleClick}
+                disableClick={true}
                 showSpecter={showSpecter && isPlaying}
             >
                 {trackName} - {artistName}
@@ -125,8 +129,9 @@ export const Widget = () => {
                 onClick={nextTrack}
                 Icon={Icons.Next}
                 disableInner={true}
+                disableClick={true}
             >
             </DataWidget.Widget>
-        </div >
+        </DataWidget.Widget >
     );
 };
