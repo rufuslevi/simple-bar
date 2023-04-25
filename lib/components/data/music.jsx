@@ -15,94 +15,118 @@ const { refreshFrequency, showSpecter } = musicWidgetOptions;
 
 const DEFAULT_REFRESH_FREQUENCY = 10000;
 const REFRESH_FREQUENCY = Settings.getRefreshFrequency(
-  refreshFrequency,
-  DEFAULT_REFRESH_FREQUENCY
+    refreshFrequency,
+    DEFAULT_REFRESH_FREQUENCY
 );
 
 const togglePlay = (isPaused, processName) => {
-  if (isPaused) {
-    Uebersicht.run(`osascript -e 'tell application "${processName}" to play'`);
-  } else {
-    Uebersicht.run(`osascript -e 'tell application "${processName}" to pause'`);
-  }
+    if (isPaused) {
+        Uebersicht.run(`osascript -e 'tell application "${processName}" to play'`);
+    } else {
+        Uebersicht.run(`osascript -e 'tell application "${processName}" to pause'`);
+    }
 };
 
 export const Widget = () => {
-  const [state, setState] = Uebersicht.React.useState();
-  const [loading, setLoading] = Uebersicht.React.useState(musicWidget);
+    const [state, setState] = Uebersicht.React.useState();
+    const [loading, setLoading] = Uebersicht.React.useState(musicWidget);
 
-  const getMusic = async () => {
-    const osVersion = await Uebersicht.run(`sw_vers -productVersion`);
-    const processName =
-      Utils.cleanupOutput(osVersion) === "10.15" ? "iTunes" : "Music";
-    const isRunning = await Uebersicht.run(
-      `osascript -e 'tell application "System Events" to (name of processes) contains "${processName}"' 2>&1`
+    const getMusic = async () => {
+        const osVersion = await Uebersicht.run(`sw_vers -productVersion`);
+        const processName =
+            Utils.cleanupOutput(osVersion) === "10.15" ? "iTunes" : "Music";
+        const isRunning = await Uebersicht.run(
+            `osascript -e 'tell application "System Events" to (name of processes) contains "${processName}"' 2>&1`
+        );
+        if (Utils.cleanupOutput(isRunning) === "false") {
+            setLoading(false);
+            return;
+        }
+        const [playerState, trackName, artistName] = await Promise.all([
+            Uebersicht.run(
+                `osascript -e 'tell application "${processName}" to player state as string' 2>/dev/null || echo "stopped"`
+            ),
+            Uebersicht.run(
+                `osascript -e 'tell application "${processName}" to name of current track as string' 2>/dev/null || echo "unknown track"`
+            ),
+            Uebersicht.run(
+                `osascript -e 'tell application "${processName}" to artist of current track as string' 2>/dev/null || echo "unknown artist"`
+            ),
+        ]);
+        setState({
+            playerState: Utils.cleanupOutput(playerState),
+            trackName: Utils.cleanupOutput(trackName),
+            artistName: Utils.cleanupOutput(artistName),
+            processName: Utils.cleanupOutput(processName),
+        });
+        setLoading(false);
+    };
+
+    useWidgetRefresh(musicWidget, getMusic, REFRESH_FREQUENCY);
+
+    if (loading) return <DataWidgetLoader.Widget className="music" />;
+    if (!state) return null;
+    const { processName, playerState, trackName, artistName } = state;
+
+    if (!trackName.length) return null;
+
+    const isPlaying = playerState === "playing";
+    const Icon = isPlaying ? Icons.Playing : Icons.Paused;
+
+    const playPause = (e) => {
+        Utils.clickEffect(e);
+        togglePlay(!isPlaying, processName);
+        getMusic();
+    };
+    const nextTrack = (e) => {
+        Utils.clickEffect(e);
+        Uebersicht.run(
+            `osascript -e 'tell application "${processName}" to Next Track'`
+        );
+        getMusic();
+    };
+    const prevTrack = (e) => {
+        Utils.clickEffect(e);
+        Uebersicht.run(
+            `osascript -e 'tell application "${processName}" to Previous Track'`
+        );
+        getMusic();
+    };
+    const onMiddleClick = (e) => {
+        Utils.clickEffect(e);
+        Uebersicht.run(`open -a '${processName}'`);
+        getMusic();
+    };
+
+    const classes = Utils.classnames("music", { "music--playing": isPlaying });
+
+    return (
+        <div
+            style={{ display: 'flex' }}
+        >
+            <DataWidget.Widget
+                classes={classes}
+                onClick={prevTrack}
+                Icon={Icons.Prev}
+                disableInner={true}
+            >
+            </DataWidget.Widget>
+            <DataWidget.Widget
+                classes={classes}
+                Icon={Icon}
+                onClick={playPause}
+                onMiddleClick={onMiddleClick}
+                showSpecter={showSpecter && isPlaying}
+            >
+                {trackName} - {artistName}
+            </DataWidget.Widget>
+            <DataWidget.Widget
+                classes={classes}
+                onClick={nextTrack}
+                Icon={Icons.Next}
+                disableInner={true}
+            >
+            </DataWidget.Widget>
+        </div >
     );
-    if (Utils.cleanupOutput(isRunning) === "false") {
-      setLoading(false);
-      return;
-    }
-    const [playerState, trackName, artistName] = await Promise.all([
-      Uebersicht.run(
-        `osascript -e 'tell application "${processName}" to player state as string' 2>/dev/null || echo "stopped"`
-      ),
-      Uebersicht.run(
-        `osascript -e 'tell application "${processName}" to name of current track as string' 2>/dev/null || echo "unknown track"`
-      ),
-      Uebersicht.run(
-        `osascript -e 'tell application "${processName}" to artist of current track as string' 2>/dev/null || echo "unknown artist"`
-      ),
-    ]);
-    setState({
-      playerState: Utils.cleanupOutput(playerState),
-      trackName: Utils.cleanupOutput(trackName),
-      artistName: Utils.cleanupOutput(artistName),
-      processName: Utils.cleanupOutput(processName),
-    });
-    setLoading(false);
-  };
-
-  useWidgetRefresh(musicWidget, getMusic, REFRESH_FREQUENCY);
-
-  if (loading) return <DataWidgetLoader.Widget className="music" />;
-  if (!state) return null;
-  const { processName, playerState, trackName, artistName } = state;
-
-  if (!trackName.length) return null;
-
-  const isPlaying = playerState === "playing";
-  const Icon = isPlaying ? Icons.Playing : Icons.Paused;
-
-  const onClick = (e) => {
-    Utils.clickEffect(e);
-    togglePlay(!isPlaying, processName);
-    getMusic();
-  };
-  const onRightClick = (e) => {
-    Utils.clickEffect(e);
-    Uebersicht.run(
-      `osascript -e 'tell application "${processName}" to Next Track'`
-    );
-    getMusic();
-  };
-  const onMiddleClick = (e) => {
-    Utils.clickEffect(e);
-    Uebersicht.run(`open -a '${processName}'`);
-    getMusic();
-  };
-
-  const classes = Utils.classnames("music", { "music--playing": isPlaying });
-
-  return (
-    <DataWidget.Widget
-      classes={classes}
-      Icon={Icon}
-      onClick={onClick}
-      onRightClick={onRightClick}
-      onMiddleClick={onMiddleClick}
-      showSpecter={showSpecter && isPlaying}
-    >
-      {trackName} - {artistName}
-    </DataWidget.Widget>
-  );
 };
