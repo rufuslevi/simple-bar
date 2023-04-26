@@ -112,7 +112,7 @@ export const Widget = () => {
             disableSlider={true}
             onMiddleClick={onMiddleClick}
         >
-            {compactMusicView && <DataWidget.Widget
+            {!compactMusicView && <DataWidget.Widget
                 classes={classes}
                 style={buttonsPadding}
                 onClick={prevTrack}
@@ -131,7 +131,7 @@ export const Widget = () => {
             >
                 {trackName} - {artistName}
             </DataWidget.Widget>
-            {compactMusicView && <DataWidget.Widget
+            {!compactMusicView && <DataWidget.Widget
                 classes={classes}
                 style={buttonsPadding}
                 onClick={nextTrack}
