@@ -11,7 +11,7 @@ export { musicStyles as styles } from "../../styles/components/data/music";
 const settings = Settings.get();
 const { widgets, musicWidgetOptions } = settings;
 const { musicWidget } = widgets;
-const { refreshFrequency, showSpecter } = musicWidgetOptions;
+const { refreshFrequency, showSpecter, compactMusicView } = musicWidgetOptions;
 
 const DEFAULT_REFRESH_FREQUENCY = 10000;
 const REFRESH_FREQUENCY = Settings.getRefreshFrequency(
@@ -112,7 +112,7 @@ export const Widget = () => {
             disableSlider={true}
             onMiddleClick={onMiddleClick}
         >
-            <DataWidget.Widget
+            {compactMusicView && <DataWidget.Widget
                 classes={classes}
                 style={buttonsPadding}
                 onClick={prevTrack}
@@ -120,7 +120,7 @@ export const Widget = () => {
                 disableInner={true}
                 disableClick={true}
             >
-            </DataWidget.Widget>
+            </DataWidget.Widget>}
             <DataWidget.Widget
                 classes={classes}
                 style={centerPadding}
@@ -131,7 +131,7 @@ export const Widget = () => {
             >
                 {trackName} - {artistName}
             </DataWidget.Widget>
-            <DataWidget.Widget
+            {compactMusicView && <DataWidget.Widget
                 classes={classes}
                 style={buttonsPadding}
                 onClick={nextTrack}
@@ -139,7 +139,7 @@ export const Widget = () => {
                 disableInner={true}
                 disableClick={true}
             >
-            </DataWidget.Widget>
+            </DataWidget.Widget>}
         </DataWidget.Widget >
     );
 };
