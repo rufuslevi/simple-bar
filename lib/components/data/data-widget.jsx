@@ -40,7 +40,7 @@ export const Widget = ({
     const ref = Uebersicht.React.useRef();
     const Tag = getTag(onClick, href);
     const dataWidgetClasses = Utils.classnames("data-widget", classes, !disableClick && {
-        "data-widget--clickable": onClick,
+        "data-widget--clickable": onClick || onMiddleClick,
     });
 
     const onClickProp = (e) => {

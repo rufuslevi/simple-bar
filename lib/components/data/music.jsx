@@ -99,16 +99,22 @@ export const Widget = () => {
     };
 
     const classes = Utils.classnames("music", { "music--playing": isPlaying });
-    const clickable = Utils.classnames("music", "data-widget--clickable");
+    const centerPadding = {
+        padding: "0px 4px",
+    }
+    const buttonsPadding = {
+        padding: "0px",
+    }
 
     return (
         <DataWidget.Widget
-            classes={clickable}
+            classes={classes}
             disableSlider={true}
             onMiddleClick={onMiddleClick}
         >
             <DataWidget.Widget
                 classes={classes}
+                style={buttonsPadding}
                 onClick={prevTrack}
                 Icon={Icons.Prev}
                 disableInner={true}
@@ -117,6 +123,7 @@ export const Widget = () => {
             </DataWidget.Widget>
             <DataWidget.Widget
                 classes={classes}
+                style={centerPadding}
                 Icon={Icon}
                 onClick={playPause}
                 disableClick={true}
@@ -126,6 +133,7 @@ export const Widget = () => {
             </DataWidget.Widget>
             <DataWidget.Widget
                 classes={classes}
+                style={buttonsPadding}
                 onClick={nextTrack}
                 Icon={Icons.Next}
                 disableInner={true}
