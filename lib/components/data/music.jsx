@@ -29,6 +29,7 @@ const togglePlay = (isPaused, processName) => {
 
 export const Widget = () => {
     const [state, setState] = Uebersicht.React.useState();
+    const [hover, setHover] = Uebersicht.React.useState(false);
     const [loading, setLoading] = Uebersicht.React.useState(musicWidget);
 
     const getMusic = async () => {
@@ -112,34 +113,43 @@ export const Widget = () => {
             disableSlider={true}
             onMiddleClick={onMiddleClick}
         >
-            {!compactMusicView && <DataWidget.Widget
-                classes={classes}
+            <div
+                className="data-widget"
                 style={buttonsPadding}
-                onClick={prevTrack}
-                Icon={Icons.Prev}
-                disableInner={true}
-                disableClick={true}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
             >
-            </DataWidget.Widget>}
-            <DataWidget.Widget
-                classes={classes}
-                style={centerPadding}
-                Icon={Icon}
-                onClick={playPause}
-                disableClick={true}
-                showSpecter={showSpecter && isPlaying}
-            >
-                {trackName} - {artistName}
-            </DataWidget.Widget>
-            {!compactMusicView && <DataWidget.Widget
-                classes={classes}
-                style={buttonsPadding}
-                onClick={nextTrack}
-                Icon={Icons.Next}
-                disableInner={true}
-                disableClick={true}
-            >
-            </DataWidget.Widget>}
+                {!compactMusicView && <DataWidget.Widget
+                    classes={classes}
+                    style={buttonsPadding}
+                    onClick={prevTrack}
+                    Icon={Icons.Prev}
+                    disableInner={true}
+                    disableClick={true}
+                >
+                </DataWidget.Widget>}
+                <DataWidget.Widget
+                    classes={classes}
+                    style={centerPadding}
+                    Icon={Icon}
+                    onClick={playPause}
+                    trigger={hover}
+                    disableSlider={true}
+                    disableClick={true}
+                    showSpecter={showSpecter && isPlaying}
+                >
+                    {trackName} - {artistName}
+                </DataWidget.Widget>
+                {!compactMusicView && <DataWidget.Widget
+                    classes={classes}
+                    style={buttonsPadding}
+                    onClick={nextTrack}
+                    Icon={Icons.Next}
+                    disableInner={true}
+                    disableClick={true}
+                >
+                </DataWidget.Widget>}
+            </div >
         </DataWidget.Widget >
     );
 };

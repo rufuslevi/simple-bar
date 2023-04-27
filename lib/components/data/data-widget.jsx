@@ -14,8 +14,8 @@ const isMiddleClick = (e) => {
     return e.button === 1 || e["button&2"] === 1;
 };
 
-const Inner = ({ disableSlider, children }) => {
-    if (disableSlider) return children;
+const Inner = ({ disableSlider, trigger, children }) => {
+    if (disableSlider && trigger === undefined) return children;
     return (
         <div className="data-widget__inner">
             <div className="data-widget__slider">{children}</div>
@@ -31,9 +31,10 @@ export const Widget = ({
     onRightClick,
     onMiddleClick,
     style,
-    disableSlider,
+    trigger,
     showSpecter,
     children,
+    disableSlider,
     disableInner,
     disableClick,
 }) => {
@@ -58,6 +59,10 @@ export const Widget = ({
     const onMouseLeave = () =>
         Utils.stopSliding(ref.current, ".data-widget__slider");
 
+    Uebersicht.React.useEffect(() => {
+        trigger ? onMouseEnter() : onMouseLeave();
+    }, [trigger]);
+
     return (
         <Tag
             ref={ref}
@@ -71,7 +76,7 @@ export const Widget = ({
         >
             {Icon && <Icon />}
             {showSpecter && <Specter.Widget />}
-            {!disableInner && <Inner disableSlider={disableSlider}>{children}</Inner>}
+            {!disableInner && <Inner disableSlider={disableSlider} trigger={trigger}>{children}</Inner>}
         </Tag>
     );
 };
